@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ThemeProviderContext } from "./theme-context";
 import type { Theme, ThemeProviderProps } from "./types";
-import { useTenantContext } from "../tenants/use-tenant";
+import { useTenant } from "../tenants/use-tenant";
 
 export function ThemeProvider({
   children,
@@ -9,7 +9,7 @@ export function ThemeProvider({
   storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const tenant = useTenantContext();
+  const tenant = useTenant();
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
@@ -36,7 +36,7 @@ export function ThemeProvider({
     // Aplica el tema del tenant si existe y es válido
     if (tenant?.theme && ["blue", "green", "red"].includes(tenant.theme)) {
       root.classList.add(`theme-${tenant.theme}`);
-    }else{
+    } else {
       // si no hay tema de tenant, revisar el tema en root y si hay uno quitarlo
     }
   }, [tenant?.theme]);

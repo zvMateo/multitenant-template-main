@@ -1,12 +1,11 @@
 import { useContext } from "react";
 import { TenantContext } from "./tenant-context";
-import type { TenantConfig } from "./types";
+import type { TenantConfig } from "@/types/tenant";
 
-
-export function useTenantContext(): TenantConfig {
+export function useTenant(): TenantConfig {
   const context = useContext(TenantContext);
   if (!context) {
-    throw new Error("useTenantContext debe ser usado dentro de TenantProvider");
+    throw new Error("useTenant must be used within TenantProvider");
   }
   return context;
 }

@@ -1,4 +1,4 @@
-import { useTenantContext } from "@/components/providers/tenants/use-tenant";
+import { useTenant } from "@/components/providers/tenants/use-tenant";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,7 +18,7 @@ const homePrincipalUrl = `http://${
 }/a`;
 
 export default function HomePage() {
-  const { name } = useTenantContext();
+  const { name } = useTenant();
 
   return (
     <div>
