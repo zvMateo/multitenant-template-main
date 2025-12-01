@@ -1,11 +1,9 @@
-// src/hooks/api/use-vehiculos.ts
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { mockApi } from "@/api/mock";
+import type { Vehiculo } from "@/types/common";
+import { useTenant } from "@/components/providers/tenants/use-tenant";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { mockApi } from '@/api/mock';
-import type { Vehiculo } from '@/types/common';
-import { useTenant } from '@/components/providers/tenants/use-tenant';
-
-const QUERY_KEY_VEHICULOS = 'vehiculos';
+const QUERY_KEY_VEHICULOS = "vehiculos";
 
 export const useVehiculos = () => {
   const tenantConfig = useTenant();
@@ -34,10 +32,17 @@ export const useCreateVehiculo = () => {
   const tenantConfig = useTenant();
   const id_empresa = tenantConfig?.id;
 
-  return useMutation<Vehiculo, Error, Omit<Vehiculo, 'id' | 'activo' | 'id_empresa'>>({
-    mutationFn: (newVehiculoData) => mockApi.createVehiculo({ ...newVehiculoData, id_empresa: id_empresa! }),
+  return useMutation<
+    Vehiculo,
+    Error,
+    Omit<Vehiculo, "id" | "activo" | "id_empresa">
+  >({
+    mutationFn: (newVehiculoData) =>
+      mockApi.createVehiculo({ ...newVehiculoData, id_empresa: id_empresa! }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_VEHICULOS, id_empresa] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY_VEHICULOS, id_empresa],
+      });
     },
   });
 };
@@ -47,10 +52,16 @@ export const useUpdateVehiculo = () => {
   const tenantConfig = useTenant();
   const id_empresa = tenantConfig?.id;
 
-  return useMutation<Vehiculo | undefined, Error, Partial<Vehiculo> & { id: string }>({
+  return useMutation<
+    Vehiculo | undefined,
+    Error,
+    Partial<Vehiculo> & { id: string }
+  >({
     mutationFn: ({ id, ...data }) => mockApi.updateVehiculo(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_VEHICULOS, id_empresa] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY_VEHICULOS, id_empresa],
+      });
     },
   });
 };
@@ -63,7 +74,9 @@ export const useDeleteVehiculo = () => {
   return useMutation<boolean, Error, string>({
     mutationFn: mockApi.deleteVehiculo,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_VEHICULOS, id_empresa] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY_VEHICULOS, id_empresa],
+      });
     },
   });
 };

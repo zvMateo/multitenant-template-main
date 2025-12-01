@@ -6,21 +6,28 @@ import { UnitProvider } from "./components/providers/unit/unit-provider";
 import { ThemeProvider } from "./components/providers/theme/theme-provider";
 import { Toaster } from "./components/ui/sonner";
 import { Routing } from "./routes/routes";
+import { HeaderContext } from "./components/layout/HeaderContext";
+import { RoleProvider } from "./components/providers/roles/role-provider";
 
 const queryClient = new QueryClient();
-
-import { RoleProvider } from "./components/providers/roles/role-provider";
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TenantProvider>
-        <UnitProvider>
+        <UnitProvider
+          initialUnit={{
+            id: "unit1",
+            name: "Default Unit",
+            domain: "localhost",
+          }}
+        >
           <RoleProvider>
             <ThemeProvider
               defaultTheme="system"
               storageKey="multitenant-ui-theme"
             >
+              <HeaderContext />
               <Routing />
               <Toaster />
             </ThemeProvider>

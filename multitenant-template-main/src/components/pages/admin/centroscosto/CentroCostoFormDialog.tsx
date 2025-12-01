@@ -1,15 +1,15 @@
 // src/components/pages/admin/centroscosto/CentroCostoFormDialog.tsx
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -18,18 +18,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { CentroCosto } from '@/types/common';
-import { useEffect } from 'react';
-import { useCreateCentroCosto, useUpdateCentroCosto } from '@/hooks/api/use-centroscosto';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { CentroCosto } from "@/types/common";
+import { useEffect } from "react";
+import {
+  useCreateCentroCosto,
+  useUpdateCentroCosto,
+} from "@/hooks/api/use-centroscosto";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
 const centroCostoFormSchema = z.object({
   nombre: z.string().min(2, {
-    message: 'El nombre debe tener al menos 2 caracteres.',
+    message: "El nombre debe tener al menos 2 caracteres.",
   }),
   descripcion: z.string().optional(),
   activo: z.boolean().default(true),
@@ -43,12 +46,16 @@ interface CentroCostoFormDialogProps {
   centroCosto?: CentroCosto;
 }
 
-export function CentroCostoFormDialog({ isOpen, onClose, centroCosto }: CentroCostoFormDialogProps) {
+export function CentroCostoFormDialog({
+  isOpen,
+  onClose,
+  centroCosto,
+}: CentroCostoFormDialogProps) {
   const form = useForm<CentroCostoFormValues>({
     resolver: zodResolver(centroCostoFormSchema),
     defaultValues: {
-      nombre: '',
-      descripcion: '',
+      nombre: "",
+      descripcion: "",
       activo: true,
     },
   });
@@ -72,14 +79,17 @@ export function CentroCostoFormDialog({ isOpen, onClose, centroCosto }: CentroCo
     try {
       if (centroCosto) {
         // Update existing centroCosto
-        await updateCentroCostoMutation.mutateAsync({ id: centroCosto.id, ...values });
+        await updateCentroCostoMutation.mutateAsync({
+          id: centroCosto.id,
+          ...values,
+        });
       } else {
         // Create new centroCosto
         await createCentroCostoMutation.mutateAsync(values);
       }
       onClose();
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error("Error submitting form:", error);
       // TODO: Show a toast or alert for error
     }
   };
@@ -88,11 +98,13 @@ export function CentroCostoFormDialog({ isOpen, onClose, centroCosto }: CentroCo
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{centroCosto ? 'Editar Centro de Costo' : 'Agregar Centro de Costo'}</DialogTitle>
+          <DialogTitle>
+            {centroCosto ? "Editar Centro de Costo" : "Agregar Centro de Costo"}
+          </DialogTitle>
           <DialogDescription>
             {centroCosto
-              ? 'Modifica los detalles del centro de costo existente.'
-              : 'Completa los campos para agregar un nuevo centro de costo.'}
+              ? "Modifica los detalles del centro de costo existente."
+              : "Completa los campos para agregar un nuevo centro de costo."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -104,7 +116,10 @@ export function CentroCostoFormDialog({ isOpen, onClose, centroCosto }: CentroCo
                 <FormItem>
                   <FormLabel>Nombre</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nombre del centro de costo" {...field} />
+                    <Input
+                      placeholder="Nombre del centro de costo"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -117,7 +132,10 @@ export function CentroCostoFormDialog({ isOpen, onClose, centroCosto }: CentroCo
                 <FormItem>
                   <FormLabel>Descripción</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Descripción del centro de costo (opcional)" {...field} />
+                    <Textarea
+                      placeholder="Descripción del centro de costo (opcional)"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,8 +161,14 @@ export function CentroCostoFormDialog({ isOpen, onClose, centroCosto }: CentroCo
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={createCentroCostoMutation.isPending || updateCentroCostoMutation.isPending}>
-              {centroCosto ? 'Guardar Cambios' : 'Crear Centro de Costo'}
+            <Button
+              type="submit"
+              disabled={
+                createCentroCostoMutation.isPending ||
+                updateCentroCostoMutation.isPending
+              }
+            >
+              {centroCosto ? "Guardar Cambios" : "Crear Centro de Costo"}
             </Button>
           </form>
         </Form>
