@@ -1,35 +1,17 @@
-import axios from "axios";
+// Simula latencia de red (300ms - 1500ms) para realismo
+export const delay = (ms?: number) =>
+  new Promise((resolve) =>
+    setTimeout(resolve, ms || Math.random() * 1000 + 300)
+  );
 
-// Usamos una variable de entorno para la URL base.
-// En desarrollo (VITE_ENV=development) apuntará a tu mock o localhost de .NET
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// Helper para generar respuestas estandarizadas
+export function mockResponse<T>(data: T, meta?: any) {
+  return {
+    data,
+    success: true,
+    meta,
+  };
+}
 
-export const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Interceptor para inyectar el Tenant ID
-apiClient.interceptors.request.use(
-  (config) => {
-    const hostname = window.location.hostname;
-    // Lógica extraída de tu hook useTenantDomain.ts para consistencia
-    const appDomain = import.meta.env.VITE_APP_DOMAIN || "localhost";
-    let tenant = "default";
-
-    const subdomain = hostname.replace(`.${appDomain}`, "");
-    if (subdomain && subdomain !== hostname) {
-      tenant = subdomain;
-    }
-
-    // Header estándar para multi-tenancy
-    config.headers["X-Tenant-ID"] = tenant;
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// Aquí podrías configurar tu instancia de Axios real para el futuro
+// export const api = axios.create({ ... });

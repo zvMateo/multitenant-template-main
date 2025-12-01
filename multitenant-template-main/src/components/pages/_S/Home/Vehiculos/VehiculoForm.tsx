@@ -1,6 +1,8 @@
+// src/components/pages/_S/Home/Vehiculos/VehiculoForm.tsx
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { VehiculoFormSchema, type VehiculoFormValues } from "@/schemas/forms";
+// Verifica que este import no tenga errores ahora
 import { useCreateVehiculo } from "@/hooks/api/use-vehiculos";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner"; // Usamos sonner para notificaciones
+import { toast } from "sonner";
 
 interface VehiculoFormProps {
   onSuccess?: () => void;
@@ -39,33 +41,31 @@ export function VehiculoForm({ onSuccess }: VehiculoFormProps) {
   });
 
   const onSubmit = (values: VehiculoFormValues) => {
-    // Map form values to the API payload expected by useCreateVehiculo
-    // Convert the form tipo ("VEHICULO" | "MAQUINARIA") to the backend expected literals.
+    // Mapeo de tipos del Form (Upper) a la API (Lower/Specific)
     const mappedTipo =
       values.tipo === "MAQUINARIA"
         ? ("maquinaria" as const)
         : ("automovil" as const);
 
     const payload = {
-      ...values,
-      // Override tipo with the mapped value to satisfy the API type.
+      // Campos requeridos por Omit<Vehiculo, ...>
+      nombre: values.descripcion, // Usamos descripcion como nombre
+      patente: values.patente,
+      marca: "Generica", // Valor por defecto si no está en el form
+      modelo: "Modelo Base", // Valor por defecto
       tipo: mappedTipo,
-      // Provide required properties missing from the form with sensible defaults.
-      nombre: values.descripcion ?? "",
-      marca: "",
-      modelo: "",
-      // consumoEsperado expects an object like { lt_km?: number; lt_hr?: number }
-      consumoEsperado: { lt_km: 0 },
-      kilometrajeInicial: values.odometroActual ?? 0,
+      kilometrajeInicial: Number(values.odometroActual),
+      consumoEsperado: { lt_km: 10 }, // Valor por defecto para evitar error de tipo
     };
 
     createMutation.mutate(payload, {
       onSuccess: () => {
         toast.success("Vehículo creado correctamente");
         form.reset();
-        onSuccess?.(); // Cierra el modal
+        onSuccess?.();
       },
-      onError: () => {
+      onError: (error) => {
+        console.error(error);
         toast.error("Error al crear el vehículo");
       },
     });
@@ -89,15 +89,15 @@ export function VehiculoForm({ onSuccess }: VehiculoFormProps) {
           )}
         />
 
-        {/* Descripción */}
+        {/* Descripción / Nombre */}
         <FormField
           control={form.control}
           name="descripcion"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Marca / Modelo</FormLabel>
+              <FormLabel>Nombre / Descripción</FormLabel>
               <FormControl>
-                <Input placeholder="Toyota Hilux" {...field} />
+                <Input placeholder="Ej: Camioneta Ford Ranger" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -118,7 +118,7 @@ export function VehiculoForm({ onSuccess }: VehiculoFormProps) {
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar tipo" />
+                      <SelectValue placeholder="Seleccionar" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -137,7 +137,7 @@ export function VehiculoForm({ onSuccess }: VehiculoFormProps) {
             name="odometroActual"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Odómetro Actual (km)</FormLabel>
+                <FormLabel>Odómetro (km)</FormLabel>
                 <FormControl>
                   <Input type="number" {...field} />
                 </FormControl>

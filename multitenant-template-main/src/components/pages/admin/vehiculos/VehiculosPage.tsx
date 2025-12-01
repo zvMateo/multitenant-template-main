@@ -1,148 +1,76 @@
-// src/components/pages/admin/vehiculos/VehiculosPage.tsx
-
-import { useState } from "react";
+import { useVehiculos } from "@/hooks/api/use-vehiculos";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { PlusCircle, MoreHorizontal } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { useVehiculos, useDeleteVehiculo } from "@/hooks/api/use-vehiculos";
-import type { Vehiculo } from "@/types/common";
-import { VehiculoFormDialog } from "./VehiculoFormDialog"; // Will create this component next
+import { Truck, Car, Tractor } from "lucide-react"; // Iconos sugeridos
 
 export default function VehiculosPage() {
-  const { data: vehiculos, isLoading, isError } = useVehiculos();
-  const deleteVehiculoMutation = useDeleteVehiculo();
-
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingVehiculo, setEditingVehiculo] = useState<Vehiculo | undefined>(
-    undefined
-  );
-
-  const handleAddVehiculo = () => {
-    setEditingVehiculo(undefined);
-    setIsFormOpen(true);
-  };
-
-  const handleEditVehiculo = (vehiculo: Vehiculo) => {
-    setEditingVehiculo(vehiculo);
-    setIsFormOpen(true);
-  };
-
-  const handleDeleteVehiculo = (id: string) => {
-    if (confirm("¿Estás seguro de que quieres eliminar este vehículo?")) {
-      deleteVehiculoMutation.mutate(id);
-    }
-  };
+  const { vehiculos, isLoading, isError } = useVehiculos();
 
   if (isLoading) {
-    return <p>Cargando vehículos...</p>;
+    return (
+      <div className="p-8 space-y-4">
+        <Skeleton className="h-8 w-1/3" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    );
   }
 
-  if (isError) {
-    return <p>Error al cargar vehículos.</p>;
-  }
+  if (isError)
+    return <div className="text-red-500">Error al cargar vehículos</div>;
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Administración de Vehículos</CardTitle>
-          <CardDescription>
-            Administra los vehículos y maquinaria de tu empresa.
-          </CardDescription>
-        </div>
-        <Button size="sm" className="gap-1" onClick={handleAddVehiculo}>
-          <PlusCircle className="h-4 w-4" />
-          Agregar Vehículo
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Patente</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Marca</TableHead>
-              <TableHead>Modelo</TableHead>
-              <TableHead>Kilometraje Inicial</TableHead>
-              <TableHead>Activo</TableHead>
-              <TableHead>Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {vehiculos?.map((vehiculo) => (
-              <TableRow key={vehiculo.id}>
-                <TableCell className="font-medium">{vehiculo.nombre}</TableCell>
-                <TableCell>{vehiculo.patente}</TableCell>
-                <TableCell>
-                  {vehiculo.tipo && (
-                    <Badge variant="outline">
-                      {vehiculo.tipo.charAt(0).toUpperCase() +
-                        vehiculo.tipo.slice(1)}
-                    </Badge>
-                  )}
-                </TableCell>
-                <TableCell>{vehiculo.marca}</TableCell>
-                <TableCell>{vehiculo.modelo}</TableCell>
-                <TableCell>{vehiculo.kilometrajeInicial}</TableCell>
-                <TableCell>
-                  <Badge variant={vehiculo.activo ? "default" : "destructive"}>
-                    {vehiculo.activo ? "Activo" : "Inactivo"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Abrir menú</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => handleEditVehiculo(vehiculo)}
-                      >
-                        Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDeleteVehiculo(vehiculo.id)}
-                      >
-                        Eliminar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-      <VehiculoFormDialog
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        vehiculo={editingVehiculo}
-      />
-    </Card>
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold tracking-tight">
+          Flota de Vehículos
+        </h1>
+        <Button>+ Nuevo Vehículo</Button>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {vehiculos.map((vehiculo) => (
+          <Card key={vehiculo.id}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {vehiculo.marca} {vehiculo.modelo}
+              </CardTitle>
+              {getIconoVehiculo(vehiculo.tipo)}
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{vehiculo.patente}</div>
+              <p className="text-xs text-muted-foreground mb-4">
+                {vehiculo.tipo.toUpperCase()} - {vehiculo.anio}
+              </p>
+              <div className="flex justify-between items-center">
+                <Badge
+                  variant={
+                    vehiculo.estado === "activo" ? "default" : "destructive"
+                  }
+                >
+                  {vehiculo.estado}
+                </Badge>
+                <span className="text-sm font-mono">
+                  {vehiculo.ultimoOdometro} km
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
+}
+
+function getIconoVehiculo(tipo: string) {
+  switch (tipo) {
+    case "camion":
+      return <Truck className="h-4 w-4 text-muted-foreground" />;
+    case "maquinaria":
+      return <Tractor className="h-4 w-4 text-muted-foreground" />;
+    default:
+      return <Car className="h-4 w-4 text-muted-foreground" />;
+  }
 }

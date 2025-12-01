@@ -20,7 +20,12 @@ export interface Empresa {
   activo: boolean;
 }
 
-export type UserRole = 'operador' | 'supervisor' | 'auditor' | 'admin' | 'superadmin';
+export type UserRole =
+  | "operador"
+  | "supervisor"
+  | "auditor"
+  | "admin"
+  | "superadmin";
 
 export interface Usuario {
   id: string;
@@ -41,7 +46,7 @@ export interface Vehiculo {
   patente: string;
   marca: string;
   modelo: string;
-  tipo: 'camion' | 'maquinaria' | 'automovil' | 'otro'; // Combined types
+  tipo: "camion" | "maquinaria" | "automovil" | "otro"; // Combined types
   centroCostoId?: string;
   consumoEsperado: {
     lt_km?: number; // Litros por 100km
@@ -77,7 +82,12 @@ export interface CentroCosto {
   activo: boolean;
 }
 
-export type TipoEvidencia = 'foto_surtidor' | 'foto_odometro' | 'audio' | 'ubicacion' | 'texto';
+export type TipoEvidencia =
+  | "foto_surtidor"
+  | "foto_odometro"
+  | "audio"
+  | "ubicacion"
+  | "texto";
 
 export interface Evidencia {
   id: string;
@@ -111,7 +121,13 @@ export interface EventoCarga {
 export interface Alerta {
   id: string;
   id_empresa: string;
-  tipo: 'exceso_litros' | 'ubicacion_invalida' | 'tanque_bajo' | 'duplicado' | 'desvio_consumo' | 'error_ingreso'; // Combined types
+  tipo:
+    | "exceso_litros"
+    | "ubicacion_invalida"
+    | "tanque_bajo"
+    | "duplicado"
+    | "desvio_consumo"
+    | "error_ingreso"; // Combined types
   mensaje: string; // From combustible.ts ('descripcion' renamed to 'mensaje')
   id_evento?: string; // Consistent with existing ('eventoCargaId' renamed to 'id_evento')
   entidadAfectadaId?: string; // From admin.ts
@@ -129,3 +145,23 @@ export interface AuditLog {
   fecha: string; // Consistent with existing ('fechaHora' renamed to 'fecha')
   detalles: Record<string, any>; // From combustible.ts ('detalle' renamed to 'detalles')
 }
+
+export interface Vehiculo {
+  id: string;
+  id_empresa: string;
+  nombre: string;
+  patente: string;
+  marca: string;
+  modelo: string;
+  // Asegúrate de que estos literales coincidan con lo que mapeas en el formulario
+  tipo: "camion" | "maquinaria" | "automovil" | "otro";
+  centroCostoId?: string;
+  consumoEsperado: {
+    lt_km?: number;
+    lt_hr?: number;
+  };
+  kilometrajeInicial: number;
+  activo: boolean;
+}
+
+// ... resto de tus interfaces
