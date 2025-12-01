@@ -9,7 +9,7 @@ interface UnitProviderProps {
 }
 
 export const UnitProvider = ({ children, initialUnit }: UnitProviderProps) => {
-  const [unit, setUnit] = useState<UnitBusiness | undefined>(initialUnit);
+  const [unit] = useState<UnitBusiness | undefined>(initialUnit);
 
   return <UnitContext.Provider value={unit}>{children}</UnitContext.Provider>;
 };

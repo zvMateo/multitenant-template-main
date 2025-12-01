@@ -1,34 +1,69 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import type { Vehiculo } from "@/types/domain";
+// src/hooks/api/use-vehiculos.ts
 
-// --- API Functions (Aquí conectarás con C#) ---
-const fetchVehiculos = async (): Promise<Vehiculo[]> => {
-  const { data } = await apiClient.get("/vehiculos");
-  return data;
-};
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { mockApi } from '@/api/mock';
+import type { Vehiculo } from '@/types/common';
+import { useTenant } from '@/components/providers/tenants/use-tenant';
 
-const createVehiculo = async (
-  payload: Omit<Vehiculo, "id" | "createdAt" | "isActive">
-) => {
-  const { data } = await apiClient.post("/vehiculos", payload);
-  return data;
-};
+const QUERY_KEY_VEHICULOS = 'vehiculos';
 
-// --- Hooks ---
 export const useVehiculos = () => {
-  return useQuery({
-    queryKey: ["vehiculos"],
-    queryFn: fetchVehiculos,
+  const tenantConfig = useTenant();
+  const id_empresa = tenantConfig?.id;
+
+  return useQuery<Vehiculo[], Error>({
+    queryKey: [QUERY_KEY_VEHICULOS, id_empresa],
+    queryFn: () => mockApi.getVehiculos(id_empresa!),
+    enabled: !!id_empresa,
+  });
+};
+
+export const useVehiculo = (vehiculoId: string) => {
+  const tenantConfig = useTenant();
+  const id_empresa = tenantConfig?.id;
+
+  return useQuery<Vehiculo | undefined, Error>({
+    queryKey: [QUERY_KEY_VEHICULOS, vehiculoId],
+    queryFn: () => mockApi.getVehiculoById(vehiculoId),
+    enabled: !!vehiculoId && !!id_empresa,
   });
 };
 
 export const useCreateVehiculo = () => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: createVehiculo,
+  const tenantConfig = useTenant();
+  const id_empresa = tenantConfig?.id;
+
+  return useMutation<Vehiculo, Error, Omit<Vehiculo, 'id' | 'activo' | 'id_empresa'>>({
+    mutationFn: (newVehiculoData) => mockApi.createVehiculo({ ...newVehiculoData, id_empresa: id_empresa! }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vehiculos"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_VEHICULOS, id_empresa] });
+    },
+  });
+};
+
+export const useUpdateVehiculo = () => {
+  const queryClient = useQueryClient();
+  const tenantConfig = useTenant();
+  const id_empresa = tenantConfig?.id;
+
+  return useMutation<Vehiculo | undefined, Error, Partial<Vehiculo> & { id: string }>({
+    mutationFn: ({ id, ...data }) => mockApi.updateVehiculo(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_VEHICULOS, id_empresa] });
+    },
+  });
+};
+
+export const useDeleteVehiculo = () => {
+  const queryClient = useQueryClient();
+  const tenantConfig = useTenant();
+  const id_empresa = tenantConfig?.id;
+
+  return useMutation<boolean, Error, string>({
+    mutationFn: mockApi.deleteVehiculo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_VEHICULOS, id_empresa] });
     },
   });
 };

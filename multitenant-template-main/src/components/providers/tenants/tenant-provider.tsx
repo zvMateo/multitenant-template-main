@@ -14,6 +14,7 @@ const getTenantConfig = async ({
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
+        id: tenant,
         name: tenant,
         theme: getTenantTheme(tenant),
       });
